@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<Nodes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <Class
+    Content="public class MyEventArgs {}"
+    Name="MyEventArgs"
+    Type="class" />
+
+  <ClassName
+    Content="MyClass" />
+
+  <ConstructorParameterless
+    Content="public MyClass() { }"
+    Name="MyClass"
+    Parameters="" />
+
+  <ConstructorParametered
+    Content="public MyClass(string myString, int myInt) { this.myString = myString; this.myInt = myInt; }"
+    Name="MyClass"
+    Parameters="string myString, int myInt" />
+
+  <Delegate
+    Content="public delegate void MyEventHandler(MyEventArgs e);"
+    Name="MyEventHandler"
+    Type="delegate" />
+
+  <Event
+    Content="public event MyEventHandler MyEvent;"
+    Name="MyEvent" />
+
+  <FieldInitialized
+    Content="private int myInt = 10;"
+    Name="myInt" />
+
+  <FieldUninitialized
+    Content="private string myString;"
+    Name="myString" />
+
+  <MethodParametered
+    Content="public static string CreateString(string s, int n) { return s + n; }"
+    Name="CreateString"
+    Parameters="string s, int n" />
+
+  <MethodParameterless
+    Content="public string CreateString() { return CreateString(myString, myInt); }"
+    Name="CreateString"
+    Parameters="" />
+
+  <CallBack
+    Content="protected virtual void OnEvent() { if(MyEvent != null) MyEvent(new MyEventArgs()); }"
+    Name="OnEvent"
+    Parameters="" />
+
+  <NameSpace
+    Content="MyNameSpace" />
+
+  <PropertyReadonly
+    Content="public int MyInt { get {return myInt; } }"
+    Name="MyInt" />
+
+  <PropertyReadwrite
+    Content="public string MyString { get { return myString; } set { myString = value; } }"
+    Name="MyString" />
+
+  <ClassBody
+    Content="        public MyClass() { }" />
+
+  <SourceCode xml:space="preserve"
+              Content="using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System;
+
+namespace MyNameSpace
+{
+    public class MyClass
+    {
+        public MyClass() { }
+    }
+}" />
+
+
+  <FullSourceCode xml:space="preserve"
+                  Content="using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System;
+
+namespace MyNameSpace
+{
+    public class MyClass
+    {
+        #region Nested Types
+        public class MyEventArgs {}
+
+        public delegate void MyEventHandler(MyEventArgs e);
+        #endregion
+
+
+        #region Fields
+        private int myInt = 10;
+        private string myString;
+        #endregion
+
+
+        #region Constructors
+        public MyClass() { }
+
+        public MyClass(string myString, int myInt) { this.myString = myString; this.myInt = myInt; }
+        #endregion
+
+
+        #region Properties
+        public int MyInt { get {return myInt; } }
+
+        public string MyString { get { return myString; } set { myString = value; } }
+        #endregion
+
+
+        #region Events
+        public event MyEventHandler MyEvent;
+        #endregion
+
+
+        #region Methods
+        public string CreateString() { return CreateString(myString, myInt); }
+
+        public static string CreateString(string s, int n) { return s + n; }
+
+        protected virtual void OnEvent() { if(MyEvent != null) MyEvent(new MyEventArgs()); }
+        #endregion
+    }
+}" />
+</Nodes>
