@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -9,34 +10,46 @@ namespace CB.Dynamic.CompilerServices
     public class EventHandlerAttacher
     {
         #region Fields
-        private const string ASSEMBLY_NAME = "MyAssembly";
-        private const string FIELD_NAME = "myDelegate";
+        private const string ASSEMBLY_NAME = "__MyAssembly";
+        private const string FIELD_NAME = "__myDelegate";
         private const string FILE_NAME = MODULE_NAME + ".dll";
-        private const string HANDLER_NAME = "myHandler";
+        private const string HANDLER_NAME = "__myHandler";
         private const string INVOKE_METHOD = "Invoke";
-        private const string MODULE_NAME = "MyModule";
-        private const string TYPE_NAME = "myType";
+        private const string MODULE_NAME = "__MyModule";
+        private const string TYPE_NAME = "__MyType";
         #endregion
 
 
         #region Methods
-        public static void Attach(EventInfo eventInfo, object target, Action action)
+        public static Delegate Attach(object target, EventInfo eventInfo, Action body)
+            => Attach(target, eventInfo, (Delegate)body);
+
+        public static Delegate Attach<T>(object target, string eventName, Func<T> body)
+            => Attach(target, eventName, (Delegate)body);
+
+        public static Delegate Attach(object target, string eventName, Action body)
+            => Attach(target, eventName, (Delegate)body);
+
+        public static Delegate Attach<T>(object target, EventInfo eventInfo, Func<T> func)
+            => Attach(target, eventInfo, (Delegate)func);
+
+        public static Delegate Attach(object target, string eventName, Delegate body)
+            => Attach(target, target.GetType().GetEvent(eventName), body);
+
+        public static Delegate Attach(object target, EventInfo eventInfo, Delegate body)
         {
-            Attach(eventInfo, target, (Delegate)action);
+            var type = CreateDynamicType(eventInfo, body.GetType());
+            var instance = Activator.CreateInstance(type, body);
+            var handlerDelegate = Delegate.CreateDelegate(eventInfo.EventHandlerType, instance, HANDLER_NAME);
+            eventInfo.AddEventHandler(target, handlerDelegate);
+            return handlerDelegate;
         }
 
-        public static void Attach<T>(EventInfo eventInfo, object target, Func<T> func)
-        {
-            Attach(eventInfo, target, (Delegate)func);
-        }
+        public static void Detach(object target, EventInfo eventInfo, Delegate handler)
+            => eventInfo.RemoveEventHandler(target, handler);
 
-        public static void Attach(EventInfo eventInfo, object target, Delegate @delegate)
-        {
-            var myType = CreateDynamicType(eventInfo, @delegate.GetType());
-            var myObject = Activator.CreateInstance(myType, @delegate);
-            var handler = Delegate.CreateDelegate(eventInfo.EventHandlerType, myObject, HANDLER_NAME);
-            eventInfo.AddEventHandler(target, handler);
-        }
+        public static void Detach(object target, string eventName, Delegate handler)
+            => Detach(target, target.GetType().GetEvent(eventName), handler);
         #endregion
 
 
@@ -73,7 +86,9 @@ namespace CB.Dynamic.CompilerServices
                 new[] { fieldInfo.FieldType });
             var ctorGen = ctorBuild.GetILGenerator();
             ctorGen.Emit(OpCodes.Ldarg_0);
-            ctorGen.Emit(OpCodes.Call, typeof(object).GetConstructor(new Type[0]));
+            var objConstructor = typeof(object).GetConstructor(new Type[0]);
+            Debug.Assert(objConstructor != null, "objConstructor != null");
+            ctorGen.Emit(OpCodes.Call, objConstructor);
             ctorGen.Emit(OpCodes.Ldarg_0);
             ctorGen.Emit(OpCodes.Ldarg_1);
             ctorGen.Emit(OpCodes.Stfld, fieldInfo);

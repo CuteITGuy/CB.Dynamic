@@ -12,33 +12,25 @@ namespace Test.Console.CB.Dynamic.CompilerServices
             var test = new MyTestClass();
             var random = new Random(DateTime.Now.Millisecond);
 
-            AddEvent(test, nameof(MyTestClass.EventInt), (Func<int>)(() =>
+            EventHandlerAttacher.Attach(test, nameof(MyTestClass.EventInt), () =>
             {
                 System.Console.WriteLine($"Call EventInt {random.NextDouble()}");
                 return 101;
-            }));
+            });
 
-            AddEvent(test, nameof(MyTestClass.EventVoid),
-                (Action)(() => System.Console.WriteLine($"Call EventVoid {random.NextDouble()}")));
+            EventHandlerAttacher.Attach(test, nameof(MyTestClass.EventVoid),
+                () => System.Console.WriteLine($"Call EventVoid {random.NextDouble()}"));
 
-            AddEvent(test, nameof(MyTestClass.EventComplex),
-                (Action)(() => System.Console.WriteLine($"Call EventComplex {random.NextDouble()}")));
+            EventHandlerAttacher.Attach(test, nameof(MyTestClass.EventComplex),
+                () => System.Console.WriteLine($"Call EventComplex {random.NextDouble()}"));
 
-            AddEvent(test, nameof(MyTestClass.EventString),
-                (Action)(() => System.Console.WriteLine($"Call EventString {random.NextDouble()}")));
+            EventHandlerAttacher.Attach(test, nameof(MyTestClass.EventString),
+                () => System.Console.WriteLine($"Call EventString {random.NextDouble()}"));
 
             test.CallEventVoid();
             test.CallEventInt(42);
             test.CallEventComplex(9, "Wow", true);
             test.CallEventString("a string");
-        }
-        #endregion
-
-
-        #region Implementation
-        private static void AddEvent(object target, string eventName, Delegate body)
-        {
-            EventHandlerAttacher.Attach(target.GetType().GetEvent(eventName), target, body);
         }
         #endregion
 

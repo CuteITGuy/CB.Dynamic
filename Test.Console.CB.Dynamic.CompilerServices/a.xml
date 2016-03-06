@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 
 <Nodes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:xsd="http://www.w3.org/2001/XMLSchema">
@@ -22,9 +22,9 @@
     Parameters="string myString, int myInt" />
 
   <Delegate
-    Content="public delegate void MyEventHandler(MyEventArgs e);"
+    Content="public body void MyEventHandler(MyEventArgs e);"
     Name="MyEventHandler"
-    Type="delegate" />
+    Type="body" />
 
   <Event
     Content="public event MyEventHandler MyEvent;"
@@ -97,7 +97,7 @@ namespace MyNameSpace
         #region Nested Types
         public class MyEventArgs {}
 
-        public delegate void MyEventHandler(MyEventArgs e);
+        public body void MyEventHandler(MyEventArgs e);
         #endregion
 
 
